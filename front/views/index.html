@@ -112,6 +112,32 @@
                 showError('Error creating game');
             }
         }
+
+        // async function to join an existing game
+        async function joinGame() {
+            const gameCode = document.getElementById('gameCodeInput').value.trim().toUpperCase();
+            if (!gameCode) {
+                showError('Please enter a game code');
+                return;
+            }
+            try {
+                const response = await fetch('/game/join', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ gameCode: gameCode })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = `/game/${gameCode}`;
+                } else {
+                    showError(data.message || 'Error joining game');
+                }
+            } catch (err) {
+                showError('Error joining game');
+            }
+        }
     </script>
 </body>
 
