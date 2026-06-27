@@ -138,6 +138,36 @@
                 showError('Error joining game');
             }
         }
+
+        // copy the game code to the clipboard
+        function copyGameCode() {
+            const gameCode = document.getElementById('gameCode').textContent;
+            navigator.clipboard.writeText(gameCode).then(() => {
+                const copyButton = document.querySelector('.copy-button');
+                const originalText = copyButton.textContent;
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyButton.textContent = originalText;
+                }, 2000);
+            })
+                .catch(err => {
+                    console.error('Error copying game code', err);
+                    showError('Error copying game code');
+                });
+        }
+
+        // verify errors in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        if (error) {
+            showError(
+                error === 'noCode' ? 'Please enter a game code' :
+                    error === 'invalidCode' ? 'Invalid game code' :
+                        error === 'gameNotFound' ? 'Game not found' :
+                            error === 'gameFull' ? 'Game is full' :
+                                'Error joining game'
+            );
+        }
     </script>
 </body>
 
