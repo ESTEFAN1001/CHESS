@@ -11,7 +11,7 @@
 <body>
     <div class="container">
         <div class="logo">
-            ♟ El Salvador Chess Club
+            ♟ Chess Club
         </div>
         <!-- Section that shows the user information and the logout button-->
         <div class="user-info">
@@ -43,20 +43,19 @@
 
     <script>
         window.addEventListener('DOMContentLoaded', async () => {
-            //get username
+            // get username
             try {
                 const response = await fetch('/auth/me');
                 const data = await response.json();
-
                 if (data.success) {
                     document.getElementById('username').textContent = data.user.username;
                 }
             } catch (err) {
-                console.error('Error getting user data:', err);
+                console.error('Error getting user data', err);
             }
-        })
+        });
 
-        //async function to close user sesion
+        // async function to close user sesion
         async function logout() {
             try {
                 const response = await fetch('/auth/logout', {
@@ -64,16 +63,53 @@
                     headers: {
                         'Content-Type': 'application/json'
                     }
-                })
+                });
                 const data = await response.json();
                 if (data.success) {
                     window.location.href = '/login';
                 } else {
                     showError('Error logging out');
                 }
-
             } catch (err) {
-                showError('Error logging out', err);
+                showError('Error logging out');
+            }
+        }
+
+        // show error messages in the user interface
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.textContent = '';
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // generate a random game code
+        function generateGameCode() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        // async function to create a new game
+        async function createGame() {
+            const gameCode = generateGameCode();
+            try {
+                const response = await fetch('/game/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ gameCode: gameCode, timeControl: 10 })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = `/game/${gameCode}`;
+                } else {
+                    showError(data.message || 'Error creating game');
+                }
+            } catch (err) {
+                showError('Error creating game');
             }
         }
     </script>
