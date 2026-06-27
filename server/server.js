@@ -9,7 +9,7 @@ require("dotenv").config();
 
 // middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(path.join(__dirname, "../front")));
 
 // routes
 app.get("/", (req, res) => {
@@ -35,4 +35,3 @@ const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
