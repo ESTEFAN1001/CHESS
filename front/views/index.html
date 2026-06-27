@@ -41,6 +41,42 @@
         </div>
     </div>
 
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            //get username
+            try {
+                const response = await fetch('/auth/me');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('username').textContent = data.user.username;
+                }
+            } catch (err) {
+                console.error('Error getting user data:', err);
+            }
+        })
+
+        //async function to close user sesion
+        async function logout() {
+            try {
+                const response = await fetch('/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = '/login';
+                } else {
+                    showError('Error logging out');
+                }
+
+            } catch (err) {
+                showError('Error logging out', err);
+            }
+        }
+    </script>
 </body>
 
 </html>
