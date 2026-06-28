@@ -177,4 +177,39 @@ router.post('/logout', (req, res) => {
     });
 });
 
+// get current user
+router.get('/me', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({
+            success: false,
+            message: 'Not authenticated'
+        });
+    }
+
+    try {
+        const result = await db.query(
+            'SELECT id, username, email FROM users WHERE id = $1',
+            [req.session.userId]
+        );
+        if (!result.rows[0]) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            user: result.rows[0]
+        });
+
+    } catch (err) {
+        console.error('Error fetching user data', err);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching user data. Please try again'
+        });
+    }
+});
+
 module.exports = router;
