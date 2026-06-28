@@ -77,4 +77,104 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// login user
+router.post('/login', async (req, res) => {
+    console.log('Login attempt: ', { username: req.body.username });
+
+    try {
+        const { username, password } = req.body;
+
+        // basic validations
+        if (!username || !password) {
+            console.log('Error:Missing fields in login');
+            return res.status(400).json({
+                success: false,
+                message: 'Username and password are required'
+            });
+        }
+
+        // Find user by username
+        console.log('Searching user in database...');
+        const result = await db.query(
+            'SELECT * FROM users WHERE username = $1',
+            [username]
+        );
+
+        const user = result.rows[0];
+
+        if (!user) {
+            console.log('Error:User not found');
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid username or password'
+            });
+        }
+
+        // Verify password
+        console.log('Verifying password...');
+        const Validpassword = await bcrypt.compare(password, user.password_hash);
+
+        if (!Validpassword) {
+            console.log('Error:Incorrect password');
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid username or password'
+            });
+        }
+
+        // Update last_login
+        console.log('Updating last login...');
+        await db.query(
+            'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
+            [user.id]
+        );
+
+        // Set session
+        req.session.userId = user.id;
+
+        console.log('login successful:', { username: user.username, id: user.id });
+        res.json({
+            success: true,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email
+            },
+            message: 'Login successful'
+        });
+
+    } catch (err) {
+        console.error('Detailed login error', {
+            error: err.message,
+            code: err.code,
+            detail: err.detail,
+            table: err.table,
+            constraint: err.constraint
+        });
+        res.status(500).json({
+            success: false,
+            message: 'Error logging in. Please try again'
+        });
+    }
+});
+
+// logout user
+router.post('/logout', (req, res) => {
+
+    req.session.destroy(err => {
+        if (err) {
+            console.error('Error in logout', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Error logging out. Please try again'
+            });
+        }
+        res.json({
+            success: true,
+            message: 'Logout successful'
+        });
+
+    });
+});
+
 module.exports = router;
