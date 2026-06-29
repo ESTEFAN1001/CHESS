@@ -65,6 +65,35 @@
             </div>
         </div>
     </div>
+
+    <script>
+        let playerColor = '{{color}}';
+        let gameCode = '{{gameCode}}';
+        let timeControl = parseInt('{{timeControl}}');
+        let playerReady = false;
+
+        $('#readyButton').on('click', function () {
+            playerReady = true;
+            $(this).prop('disabled', true).text('waiting for opponent...');
+            socket.emit('playerReady');
+
+        });
+
+        // auxiliary function to format time (convert seconds to MM:SS)
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // function to copy the game code
+        function copyGameCode() {
+            navigator.clipboard.writeText(gameCode);
+            alert('Game code copied to clipboard!');
+        }
+    </script>
+
+    <script src="/public/js/index.js"></script>
 </body>
 
 </html>
