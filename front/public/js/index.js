@@ -201,3 +201,16 @@ socket.on('chat', function (data) {
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 });
+
+// Timer functionality
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// Update timers
+socket.on('updateTimers', function (data) {
+    document.getElementById('whiteTimer').textContent = formatTime(data.whiteTime);
+    document.getElementById('blackTimer').textContent = formatTime(data.blackTime);
+});
