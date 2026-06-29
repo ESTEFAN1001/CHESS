@@ -56,7 +56,58 @@ module.exports = function (io) {
 
                 });
             }
+        });
 
+        // event when a player shows that is ready to play
+        socket.on('playerReady', () => {
+            const player = players[socket.id];
+            if (!player) return;
+
+            const game = games[player.gameCode];
+            if (!game) return;
+
+            console.log('Player ${player.username} is ready');
+
+            if (player.color === 'white') {
+                game.whiteReady = true;
+            } else if (player.color === 'black') {
+                game.blackReady = true;
+            }
+
+            // if both players are ready and the game is not started, we start the game
+            if (game.whiteReady && game.blackReady && !game.gameStarted) {
+                console.log('Game ${player.gameCode} starting');
+                game.gameStarted = true;
+                io.to(player.gameCode).emit('bothPlayersReady');
+
+                // initialize the timer for each player
+                game.timer = setInterval(() => {
+                    if (game.turn === 'white') {
+                        game.WhiteTime--;
+                    } else {
+                        game.BlackTime--;
+                    }
+
+                    // notify all players about the new time
+                    io.to(player.gameCode).emit('timeUpdate', {
+                        white: game.WhiteTime,
+                        black: game.BlackTime
+                    });
+
+                    //verify if a player has no time
+                    if (game.whiteTime <= 0) {
+                        clearInterval(game.timer);
+                        io.to(player.gameCode).emit('gameOverTime', {
+                            winnerUsername: players[game.black].username
+                        });
+                    } else if (game.blackTime <= 0) {
+                        clearInterval(game.timer);
+                        io.to(player.gameCode).emit('gameOverTime', {
+                            winnerUsername: players[game.white].username
+                        });
+                    }
+                }, 1000);
+            }
         });
     });
 };
