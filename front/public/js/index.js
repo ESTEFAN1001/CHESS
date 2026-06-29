@@ -129,3 +129,47 @@ function onDrop(source, target) {
 
     updateStatus();
 }
+
+/**
+ * Update board position after the piece snap animation
+*/
+function onSnapEnd() {
+    board.position(game.fen());
+}
+
+/**
+ * Update game status
+*/
+function updateStatus() {
+    let status = '';
+    let moveColor = game.turn() === 'b' ? 'Black' : 'White';
+
+    // If checkmate
+    if (game.in_checkmate()) {
+        status = `Game over, ${moveColor} is in checkmate. `;
+
+        socket.emit('checkmate', {
+            winner: game.turn() === 'b' ? 'white' : 'black'
+
+        });
+        gameOver = true;
+    }
+
+    // If draw
+    else if (game.in_draw()) {
+        status = 'Game over, drawn position';
+        socket.emit('draw');
+        gameOver = true;
+    }
+
+    //Game still on
+    else {
+        status = `${moveColor} to move`;
+        // If check
+        if (game.in_check()) {
+            status += `, ${moveColor} is in check`;
+        }
+    }
+    $status.text(status);
+    $pgn.html(game.pgn());
+}
