@@ -91,6 +91,39 @@
             navigator.clipboard.writeText(gameCode);
             alert('Game code copied to clipboard!');
         }
+
+        /* --- Socket.io connection --- */
+        // join the game
+        socket.emit('joinGame', {
+            code: gameCode,
+            Color: playerColor,
+            timeControl: timeControl,
+            username: playerUsername
+        });
+
+        // when both players get connected
+        socket.on('playerConnected', function (data) {
+            $('#readyButton').prop('disabled', false);
+            $('#status').text(`Both players connected (${data.white} vs ${data.black}). Click ready when you want to play!`)
+        });
+
+        // handle end of the game by time
+        socket.on('gameOverTime', function (data) {
+            $('#status').text('Game Over - ' + data.winnerUsername + ' wins on time!');
+            $('#readyButton').hide();
+        });
+
+        // handle player disconnected
+        socket.on('gameOverDisconnect', function (data) {
+            $('#status').text('Game Over - ' + data.username + ' disconnected');
+            $('#readyButton').hide();
+        });
+
+        // update timers
+        socket.on('timeUpdate', function (data) {
+            document.getElementById('whiteTimer').textContent = formatTime(data.white);
+            document.getElementById('blackTimer').textContent = formatTime(data.black);
+        });
     </script>
 
     <script src="/public/js/index.js"></script>
