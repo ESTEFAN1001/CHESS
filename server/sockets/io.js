@@ -156,6 +156,49 @@ module.exports = function (io) {
                 message: message
             });
         });
+
+        // event when a player gets disconnected
+        socket.on('disconnect', () => {
+            const player = players[socket.id];
+            if (player) {
+                console.log('Player ${player.username} disconnected from game ${player.gameCode}');
+
+                const game = games[player.gameCode];
+                if (game) {
+                    if (game.timer) {
+                        clearInterval(game.timer);
+                    }
+
+                    // we notify all that a player gets disconnected
+                    io.to(player.gameCode).emit('gameOverDisconnect', {
+                        username: player.username
+                    });
+                }
+
+                // we delete the player from the player's list
+                delete players[socket.id];
+            }
+        });
+
+        // event when a player makes checkmate
+        socket.on('checkmate', (data) => {
+            const player = players[socket.id];
+            if (!player) return;
+
+            const game = games[player.gameCode];
+            if (!game) return;
+
+            if (game.timer) {
+                clearInterval(game.timer);
+            }
+
+            // we notify all players that the game ended
+            io.to(player.gameCode).emit('gameOver', {
+                reason: 'checkmate',
+                winner: data.winner,
+                winnerUsername: players[data.winner === 'white' ? game.white : game.black].username
+            });
+        });
     });
 };
 
