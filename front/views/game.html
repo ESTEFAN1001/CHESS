@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Game</title>
+
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- Chess -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+    <!-- Chessboard -->
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+
+    <!-- css -->
+    <link rel="stylesheet" href="/public/css/game.css">
+
+    <script>
+        const socket = io();
+        let playerUsername = '{{username}}';
+    </script>
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="game-board">
+            <div id="myBoard"></div>
+            <div class="game-status" id="status"></div>
+            <lavel>PGN:</lavel>
+            <div id="pgn"></div>
+        </div>
+
+        <div class="game-info">
+            <div class="timer">
+                <div>
+                    <span class="timer-label">White: </span>
+                    <span class="timer-value" id="whiteTimer">10:00</span>
+                </div>
+                <div>
+                    <span class="timer-label">Black: </span>
+                    <span class="timer-value" id="blackTimer">10:00</span>
+                </div>
+            </div>
+            <div class="game-code-container">
+                <div class="game-code" id="gameCode">Game code: {{gameCode}}</div>
+                <button class="copy-button" onclick="copyGameCode()">Copy</button>
+            </div>
+
+            <button id="readyButton" class="ready-button">Ready to play!</button>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Write a message..."
+                        onkeypress="if(event.key === 'Enter') sendMessage()">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
