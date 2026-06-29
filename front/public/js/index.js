@@ -173,3 +173,31 @@ function updateStatus() {
     $status.text(status);
     $pgn.html(game.pgn());
 }
+
+// Chat functionality
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+
+    if (message) {
+        socket.emit('chat', message);
+        input.value = '';
+    }
+}
+
+// Handle enter key in chat input
+document.getElementById('chatInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+// Handle chat messages
+socket.on('chat', function (data) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageElement = document.createElement('div');
+    messageElement.className = 'chat-message';
+    messageElement.textContent = `${data.username}: ${data.message}`;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+});
