@@ -214,3 +214,23 @@ socket.on('updateTimers', function (data) {
     document.getElementById('whiteTimer').textContent = formatTime(data.whiteTime);
     document.getElementById('blackTimer').textContent = formatTime(data.blackTime);
 });
+
+// Ready button handler
+document.getElementById('readyButton').addEventListener('click', function () {
+    socket.emit('playerReady');
+    this.disabled = true;
+    this.textContent = 'waiting for opponent...';
+});
+
+// Join game room if code is provided in URL
+var urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('code')) {
+    socket.emit('joinGame', {
+        code: urlParams.get('code')
+    });
+}
+
+// Initialize game when page loads
+$(document).ready(function () {
+    initGame();
+});
