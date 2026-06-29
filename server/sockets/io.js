@@ -109,6 +109,53 @@ module.exports = function (io) {
                 }, 1000);
             }
         });
+
+        // event when a player makes a move
+        socket.on('move', (data) => {
+            const player = players[socket.id];
+            if (!player) {
+                console.log('Move rejected: Player not found');
+                return;
+            }
+
+            const game = games[player.gameCode];
+            if (!game || !game.gameStarted) {
+                console.log('Move rejected: Game not found or not started');
+                return;
+            }
+
+            // we verify if the turn is the player's turn
+            if (game.turn !== player.color) {
+                console.log('Move rejected: Not player\'s turn');
+                return;
+            }
+            console.log('Move from ${player.color} in game ${player.gameCode}: ${data.from} to ${data.to}');
+
+            // we change the turn
+            game.turn = game.turn === 'white' ? 'black' : 'white';
+
+            // we notify the move to all players
+            io.to(player.gameCode).emit('move', {
+                from: data.from,
+                to: data.to,
+                promotion: data.promotion,
+                color: player.color
+            });
+        });
+
+        // event to manage chat messages
+        socket.on('chat', (message) => {
+            const player = players[socket.id];
+            if (!player) return;
+
+            console.log('Chat message from ${player.username}; ${message}');
+
+            // we send the message to all players in the game
+            io.to(player.gameCode).emit('chat', {
+                username: player.username,
+                message: message
+            });
+        });
     });
 };
 
