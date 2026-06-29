@@ -79,3 +79,53 @@ socket.on('gameOver', function (data) {
     gameOver = true;
     $status.text('Game Over').prop('disabled', true);
 });
+
+/**
+ * Check if a piece can be moved
+*/
+function onDragStart(source, piece, position, orientation) {
+
+    // Do not pick up pieces if the game is over
+    if (game.game_over() || gameOver) return false;
+
+    // Only pick up pieces for the current player
+    if (!gameHasStarted) return false;
+
+    // Only pick up pieces for White is they are white
+    if (playerColor === 'white' && piece.search(/^b/) !== -1) return false;
+
+    // Only pick up pieces for Black is they are black
+    if (playerColor === 'black' && piece.search(/^w/) !== -1) return false;
+
+    // Only pick up if it's their turn
+    if ((game.turn() === 'w' && playerColor === 'black') ||
+        (game.turn() === 'b' && playerColor === 'white')) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Handle piece drop on the board
+*/
+function onDrop(source, target) {
+
+    const move = game.move({
+        from: source,
+        to: target,
+        promotion: 'q' // Always promote to a queen for simplicity
+
+    });
+
+    // if illegal move, snap back
+    if (move === null) return 'snapback';
+
+    // Emit the move to other player
+    socket.emit('move', {
+        from: source,
+        to: target,
+        promotion: 'q'
+    });
+
+    updateStatus();
+}
