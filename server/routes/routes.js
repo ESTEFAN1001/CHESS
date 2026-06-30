@@ -105,3 +105,33 @@ router.post('/join', (req, res) => {
         message: 'Joined game successfully',
     });
 });
+
+// get route to see game board
+router.get('/:gameCode', (req, res) => {
+    const { gameCode } = req.params;
+    const game = games[gameCode];
+
+    // verify game exist
+    if (!game) {
+        return res.redirect('/?error=gameNotFound');
+    }
+
+    // determine color player
+    const isWhitePlayer = game.whitePlayer === req.session.userId;
+    const isBlackPlayer = game.blackPlayer === req.session.userId;
+
+    // if player is not white nor black, redirect to lobby
+    if (!isWhitePlayer && !isBlackPlayer) {
+        return res.redirect('/?error=notPlayer')
+    }
+
+    // render the game with game data
+    res.render('game', {
+        color: isWhitePlayer ? 'white' : 'black',
+        gameCode,
+        timeControl: game.timeControl,
+        username: isWhitePlayer ? game.whitePlayer : game.blackPlayer
+    });
+});
+
+module.exports = router;
