@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Login -Chess</title>
+    <link rel="stylesheet" href="public/css/main.css">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="logo">♙</div>
+        <h2>Login</h2>
+        <div id="errorMessage" class="error-message"></div>
+        <form id="loginForm">
+            <!-- User name -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <!-- User password -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <!-- Send login information -->
+            <button type="submit">Login</button>
+
+        </form>
+        <!-- Sign up -->
+        <div class="register-link">
+            Do not have an account?
+            <a href="register">Register here</a>
+        </div>
+    </div>
+    <script>
+        //Function login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorMessage = document.getElementById('errorMessage');
+
+            try {
+                const response = await fetch('auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value,
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    errorMessage.textContent = data.message;
+                    errorMessage.style.display = 'block';
+                }
+            } catch (err) {
+                errorMessage.textContent = 'An error ocurred. Please try again later.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>
