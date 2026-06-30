@@ -40,7 +40,7 @@ router.post('/create', (req, res) => {
         created: Date.now(),
         status: 'waiting',
         players: [],
-        board
+        board: []
     };
 
     // response with succes
@@ -130,7 +130,7 @@ router.get('/:gameCode', (req, res) => {
         color: isWhitePlayer ? 'white' : 'black',
         gameCode,
         timeControl: game.timeControl,
-        username: isWhitePlayer ? game.whitePlayer : game.blackPlayer
+        username: res.locals.user.username
     });
 });
 

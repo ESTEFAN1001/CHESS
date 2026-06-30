@@ -22,7 +22,7 @@
             <!-- User password -->
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="text" id="password" name="password" required>
+                <input type="password" id="password" name="password" required>
             </div>
             <!-- Send login information -->
             <button type="submit">Login</button>
@@ -48,7 +48,7 @@
                     },
                     body: JSON.stringify({
                         username: document.getElementById('username').value,
-                        passwotrd: document.getElementById('password').value,
+                        password: document.getElementById('password').value,
                     })
                 });
 

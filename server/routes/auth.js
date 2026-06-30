@@ -6,8 +6,6 @@ const e = require('express');
 
 //register new user
 router.post('/register', async (req, res) => {
-    console.log('Registration received:', req.body);
-
     try {
         const { username, email, password } = req.body;
 
@@ -132,7 +130,7 @@ router.post('/login', async (req, res) => {
         // Set session
         req.session.userId = user.id;
 
-        console.log('login successful:', { username: user.username, id: user.id });
+        console.log('login successful:', { username: user.username });
         res.json({
             success: true,
             user: {
