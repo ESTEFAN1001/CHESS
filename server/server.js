@@ -1,5 +1,10 @@
 // imports
 const path = require('path');
+
+// priority IPv4
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const http = require('http'),
